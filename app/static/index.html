@@ -3,91 +3,157 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Консультант по трудовому праву</title>
+<title>Трудовое право для студентов</title>
 <style>
-  :root {
-    --bg: #f6f5f1; --card: #ffffff; --ink: #1d1f24; --muted: #6b6f78;
-    --line: #e3e1da; --accent: #1f5fbf; --accent-soft: #e8effa; --warn: #8a5a00; --warn-soft: #fff4dc;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #15171b; --card: #1e2127; --ink: #e9eaee; --muted: #9aa0ab;
-            --line: #2e323a; --accent: #7aa7ff; --accent-soft: #1f2a3d; --warn: #f0c060; --warn-soft: #2d2617; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
-  header h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
-  header p { margin: 0; color: var(--muted); }
-  form { display: flex; gap: 8px; margin: 24px 0 12px; }
-  textarea { flex: 1; resize: vertical; min-height: 52px; padding: 12px 14px; font: inherit;
-             color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-  button { font: inherit; cursor: pointer; border-radius: 10px; }
-  .primary { padding: 0 20px; border: 0; background: var(--accent); color: #fff; font-weight: 600; }
-  .primary:disabled { opacity: .6; cursor: wait; }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); font-size: 14px; }
-  .chip { padding: 4px 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 14px; }
-  .chip:hover { border-color: var(--accent); }
-  select { font: inherit; font-size: 14px; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--line);
-           background: var(--card); color: var(--ink); }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-top: 20px; }
-  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
-  .badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px;
-           background: var(--warn-soft); color: var(--warn); margin-left: 8px; text-transform: none; letter-spacing: 0; }
-  ol.docs { list-style: none; padding: 0; margin: 0; counter-reset: d; }
-  ol.docs li { counter-increment: d; padding: 14px 0; border-top: 1px solid var(--line); }
-  ol.docs li:first-child { border-top: 0; padding-top: 4px; }
-  .doc-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; }
-  .doc-head::before { content: counter(d) "."; color: var(--muted); margin-right: 6px; font-weight: 400; }
-  .doc-head span.src { flex: 1; }
-  .score { color: var(--muted); font-weight: 400; font-size: 14px; white-space: nowrap; }
-  .snippet { margin: 6px 0 0; color: var(--ink); font-size: 15px; }
-  .page { display: inline-block; background: var(--accent-soft); color: var(--accent); border-radius: 6px;
-          padding: 0 6px; font-size: 13px; font-weight: 600; margin-right: 6px; white-space: nowrap; }
-  .empty, .error { color: var(--muted); }
-  .error { color: #c0392b; }
-  footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
-  footer p { margin: 0 0 6px; }
-  @media (max-width: 560px) { form { flex-direction: column; } .primary { padding: 12px; } }
+:root {
+  color-scheme: light dark;
+  --bg:#f4f6f2; --card:#fff; --ink:#172821; --muted:#52645a; --line:#cdd8d0;
+  --accent:#176149; --soft:#e4f1e7; --on-accent:#fff; --cover:#123e32; --cover-text:#f4fff7;
+  --leaf:#b5e692; --leaf-shadow:#79b294; --warn:#79500a; --warn-soft:#fff2d2;
+  --bad:#9e2c30; --bad-soft:#fff0ef; --focus:#217655;
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --radius:20px; --hit:44px; --width:1120px;
+  --title:clamp(32px,5vw,62px); --pad:clamp(16px,2.5vw,32px);
+}
+@media(prefers-color-scheme:dark) {
+  :root {--bg:#101a16; --card:#192720; --ink:#edf6ef; --muted:#b4c7ba; --line:#3a5143;
+    --accent:#94dcb8; --on-accent:#112b20; --soft:#243d30; --cover:#173e32;
+    --warn:#f5cd7f; --warn-soft:#382e1b; --bad:#ffb8b7; --bad-soft:#422627; --focus:#b5e692}
+}
+* {box-sizing:border-box}
+[hidden] {display:none!important}
+body {margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+main {width:min(calc(100% - 2 * var(--s2)),var(--width));margin:auto;padding-bottom:var(--s4)}
+h1,h2,p {margin:0}
+h2 {font-size:clamp(20px,2vw,26px);line-height:1.2;letter-spacing:-.04em}
+button,select,input,textarea {font:inherit;color:inherit}
+button,select,input,a {min-height:var(--hit);min-width:var(--hit)}
+button,select,input,textarea {border:1px solid var(--line);border-radius:12px;background:var(--card);padding:8px 12px}
+button,select {cursor:pointer}
+button:hover:not(:disabled),select:hover {border-color:var(--accent)}
+button:disabled {cursor:wait}
+a {color:var(--accent);display:inline-flex;align-items:center}
+:focus-visible {outline:3px solid var(--focus);outline-offset:3px}
+.primary {font-weight:650;color:var(--on-accent);background:var(--accent);border-color:var(--accent);padding-inline:var(--s3)}
+.primary:hover:not(:disabled) {box-shadow:inset 0 0 0 2px var(--on-accent)}
+.card {border:1px solid var(--line);border-radius:var(--radius);background:var(--card);padding:var(--pad);min-width:0}
+.muted,.hint,footer,.score,.snippet {color:var(--muted)}
+.mast {display:flex;align-items:center;justify-content:space-between;gap:var(--s1);padding:var(--s2) 0;font-size:14px;font-weight:650}
+.brand {display:inline-flex;gap:10px;align-items:center}
+.mark {display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--accent);color:var(--on-accent);font:bold 24px/1 Georgia,serif}
+.mast small {color:var(--muted);font-weight:500}
+.error {color:var(--bad)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+
+.cover {position:relative;isolation:isolate;overflow:hidden;border-radius:var(--radius);background:var(--cover);color:var(--cover-text);padding:clamp(24px,4vw,56px)}
+.cover h1 {font-size:var(--title);line-height:1.02;letter-spacing:-.055em;max-width:16ch}
+.cover p {margin-top:var(--s2);max-width:49ch}
+.flower {position:absolute;z-index:-1;right:8%;top:50%;width:190px;aspect-ratio:1;display:grid;grid-template-columns:1fr 1fr;transform:translateY(-50%) rotate(-12deg);gap:3px}
+.flower i {background:var(--leaf);border-radius:55% 55% 0 55%}
+.flower i:nth-child(2){transform:rotate(90deg);background:var(--leaf-shadow)}
+.flower i:nth-child(3){transform:rotate(-90deg);background:var(--leaf-shadow)}
+.flower i:nth-child(4){transform:rotate(180deg)}
+.layout {display:grid;gap:var(--s2);margin:var(--s2) 0}
+#ask {display:grid;gap:var(--s2)}
+textarea {display:block;width:100%;resize:vertical;min-height:112px;padding:var(--s2);background:var(--bg)}
+textarea::placeholder,input::placeholder {color:var(--muted);opacity:1}
+.tools,.age-controls,#age-view {display:flex;gap:var(--s1);align-items:center;flex-wrap:wrap}
+.tools {justify-content:space-between}
+.tools label,.hint,.score,.badge,footer {font-size:14px}
+#go {width:100%}
+.age {border-bottom:1px solid var(--line);padding-bottom:var(--s2);margin-bottom:var(--s3)}
+.age label {font-weight:650}
+.hint {margin:4px 0 10px}
+.age input {width:78px}
+#age-label,.badge,.page {display:inline-block;padding:4px 10px;border-radius:8px;background:var(--soft);color:var(--accent);font-weight:650}
+#age-edit .error {margin-top:6px}
+.examples h2 {margin-bottom:var(--s2)}
+.examples button {display:flex;align-items:center;gap:12px;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;width:100%;padding:13px 0;line-height:1.35}
+.examples button:hover {color:var(--accent)}
+.examples button::after {content:'↗';margin-left:auto;color:var(--accent)}
+.icon {flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:10px;color:var(--accent);background:var(--soft)}
+.icon svg {width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+#out {scroll-margin-top:var(--s2);overflow-wrap:anywhere}
+#out .card {margin-top:var(--s2);animation:appear .18s ease-out}
+@keyframes appear {from{opacity:.5;transform:translateY(4px)}}
+#out h2 {margin-bottom:var(--s2)}
+.badge {vertical-align:middle;letter-spacing:0;margin-left:8px}
+.age-card {background:var(--warn-soft);border-color:var(--warn)}
+.age-card h2 {color:var(--warn)}
+.docs {padding-left:var(--s3);margin:0}
+.docs li {padding:8px 0;border-top:1px solid var(--line)}
+.docs li::marker {color:var(--muted)}
+summary {min-height:var(--hit);padding:8px 0;cursor:pointer;font-weight:650}
+.page {font-size:14px;margin-right:6px}
+.snippet,.score {margin:6px 0}
+.card.error {background:var(--bad-soft);border-color:var(--bad)}
+footer {border-top:1px solid var(--line);margin-top:var(--s3);padding-top:var(--s2)}
+footer p {margin-bottom:6px}
+@media(max-width:767px){.flower{width:64px;top:30px;right:-14px;opacity:.55}.cover h1{max-width:13ch}}
+@media(min-width:768px){.layout{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start}.cover p{max-width:58%}#go{width:auto}}
 </style>
 </head>
-<body>
-<main>
-  <header>
-    <h1>Трудовое право для студентов</h1>
-    <p>Опишите ситуацию на подработке — получите ответ со ссылками на статьи Трудового кодекса.</p>
-  </header>
+<body><main>
+<div class="mast"><span class="brand"><span class="mark" aria-hidden="true">§</span>Карманный справочник</span><small>НИРС · МГТУ</small></div>
+<header class="cover"><h1>Трудовое право для студентов</h1>
+<p>Опишите ситуацию на подработке. Найдём статьи закона и объясним, как они относятся к вашему вопросу.</p>
+<span class="flower" aria-hidden="true"><i></i><i></i><i></i><i></i></span></header>
+<div class="layout"><section class="card">
+<div id="age-box" class="age"><div id="age-edit"><label for="age">Сколько вам лет?</label>
+<p class="hint" id="age-hint">По желанию. Учтём особые правила для тех, кому ещё нет 18.</p>
+<div class="age-controls"><input id="age" type="number" min="10" max="100" inputmode="numeric" placeholder="17" aria-describedby="age-hint age-error">
+<button id="age-save" type="button">Сохранить</button></div><p id="age-error" class="error" role="status"></p></div>
+<div id="age-view" hidden><span id="age-label"></span><button id="age-change">изменить</button><button id="age-clear">не указывать</button></div></div>
+<form id="ask"><h2><label for="q">Что случилось на работе?</label></h2>
+<textarea id="q" maxlength="500" placeholder="Например, мне не платят за испытательный срок. Как быть?" required></textarea>
+<div class="tools"><label for="k">Показывать статей <select id="k"><option>3</option><option selected>5</option><option>10</option></select></label>
+<button id="go" class="primary">Спросить</button></div></form>
 
-  <form id="ask">
-    <textarea id="q" maxlength="500" placeholder="Например: работодатель не платит за испытательный срок — так можно?" required></textarea>
-    <button class="primary" id="go" type="submit">Спросить</button>
-  </form>
-
-  <div class="row">
-    Примеры:
-    <button class="chip" type="button">Как уволиться по собственному желанию?</button>
-    <button class="chip" type="button">Сколько длится испытательный срок?</button>
-    <button class="chip" type="button">Как оплачивается работа в ночное время?</button>
-    <button class="chip" type="button">Какой налог платит самозанятый?</button>
-  </div>
-  <div class="row" style="margin-top:8px">
-    Показывать статей:
-    <select id="k"><option>3</option><option selected>5</option><option>10</option></select>
-  </div>
-
-  <section id="out"></section>
-
-  <footer><p class="disclaimer">Сервис ищет по текстам законов и не заменяет юриста. В спорной ситуации обратитесь
-    в трудовую инспекцию или юридическую клинику вуза.</p><p id="stat">Загружаю сведения о корпусе…</p></footer>
-</main>
-
+</section><aside class="card examples"><h2>Примеры вопросов</h2>
+<button type="button"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h9v4M13 16v4H4z M8 12h13m-4-4 4 4-4 4"/></svg></span>Как уволиться по собственному желанию?</button>
+<button type="button"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5z M9 3v4m6-4v4M8 12h8m-8 4h5"/></svg></span>Сколько длится испытательный срок?</button>
+<button type="button"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11z"/></svg></span>Как оплачивается работа в ночное время?</button>
+<button type="button"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v17l-3-2-4 2-4-2-3 2z M8 9h8m-8 4h5"/></svg></span>Какой налог платит самозанятый?</button>
+</aside></div>
+<section id="out" aria-label="Результат поиска" aria-live="polite" aria-atomic="true"></section>
+<footer><p>Сервис ищет по текстам законов и не заменяет юриста. В спорной ситуации обратитесь в трудовую инспекцию или юридическую клинику вуза.</p>
+<p id="stat">Загружаю сведения о корпусе…</p><a href="/admin">Для администратора</a></footer></main>
 <script>
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-document.querySelectorAll(".chip").forEach((b) =>
-  b.addEventListener("click", () => { $("#q").value = b.textContent; $("#ask").requestSubmit(); }));
+// Возраст хранится только в этом браузере (spec/product/scenarios.md, С6).
+const AGE_KEY = "labor-law-age";
+const store = {
+  get() { try { return localStorage.getItem(AGE_KEY); } catch { return null; } },
+  set(v) { try { v == null ? localStorage.removeItem(AGE_KEY) : localStorage.setItem(AGE_KEY, v); } catch {} },
+};
+let userAge = null;
+function plural(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return "год";
+  if ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) return "года";
+  return "лет";
+}
+function showAge() {
+  const has = userAge !== null;
+  $("#age-edit").hidden = has; $("#age-view").hidden = !has;
+  if (has) $("#age-label").textContent = `Мне ${userAge} ${plural(userAge)}`;
+}
+function saveAge() {
+  const n = Number($("#age").value);
+  if (!Number.isInteger(n) || n < 10 || n > 100) { $("#age").setAttribute("aria-invalid", "true");
+    $("#age-error").textContent = "Введите целое число от 10 до 100.";
+    $("#age").focus(); return; }
+  $("#age").removeAttribute("aria-invalid"); $("#age-error").textContent = "";
+  userAge = n; store.set(String(n)); showAge(); $("#age-change").focus();
+}
+(() => { const v = Number(store.get()); if (Number.isInteger(v) && v >= 10 && v <= 100) userAge = v; showAge(); })();
+$("#age-save").addEventListener("click", saveAge);
+$("#age").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveAge(); } });
+$("#age-change").addEventListener("click", () => { $("#age").value = userAge ?? ""; $("#age-edit").hidden = false; $("#age-view").hidden = true; $("#age").focus(); });
+$("#age-clear").addEventListener("click", () => { userAge = null; store.set(null); $("#age").value = ""; showAge(); $("#age").focus(); });
+
+document.querySelectorAll(".examples button").forEach((b) =>
+  b.addEventListener("click", () => { $("#q").value = b.textContent.trim(); $("#ask").requestSubmit(); }));
 
 $("#q").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#ask").requestSubmit(); }
@@ -96,37 +162,48 @@ $("#q").addEventListener("keydown", (e) => {
 $("#ask").addEventListener("submit", async (e) => {
   e.preventDefault();
   const question = $("#q").value.trim();
-  if (!question) return;
+  if (!question || $("#go").disabled) return;
+  const examples = document.querySelectorAll(".examples button");
+  examples.forEach(button => button.disabled = true);
+  $("#out").textContent = "Ищем подходящие статьи…";
   $("#go").disabled = true; $("#go").textContent = "Ищу…";
   try {
     const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
-                                        body: JSON.stringify({ question, top_k: Number($("#k").value) }) });
+                                        body: JSON.stringify({ question, top_k: Number($("#k").value), age: userAge }) });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Ошибка сервера");
     render(data);
   } catch (err) {
-    $("#out").innerHTML = `<div class="card error">${esc(err.message)}</div>`;
+    $("#out").innerHTML = `<div class="card error">${esc(err instanceof TypeError ? "Не удалось связаться с сервером. Попробуйте ещё раз." : err.message)}</div>`;
   } finally {
+    examples.forEach(button => button.disabled = false);
+    if (matchMedia("(max-width: 767px)").matches) $("#out").scrollIntoView({block:"start"});
     $("#go").disabled = false; $("#go").textContent = "Спросить";
   }
 });
 
+function articleList(items, withScore) {
+  return '<ol class="docs">' + items.map((doc, i) => {
+    const score = withScore ? '<p class="score">Оценка ' + esc(doc.score.toFixed(2)) + '</p>' : '';
+    return `<li><details ${i === 0 ? 'open' : ''}>
+      <summary><span class="page">${esc(doc.citation)}</span> ${esc(doc.title)}</summary>
+      <p class="snippet">${esc(doc.snippet)}</p>${score}</details></li>`;
+  }).join('') + '</ol>';
+}
 function render(d) {
-  const badge = d.mode === "prototype" ? '<span class="badge">прототип</span>' : "";
-  const docs = d.documents.length
-    ? `<ol class="docs">${d.documents.map((x) => `
-        <li><div class="doc-head"><span class="src"><span class="page">${esc(x.citation)}</span> ${esc(x.title)}</span>
-            <span class="score">оценка ${x.score.toFixed(2)}</span></div>
-            <p class="snippet">${esc(x.snippet)}</p></li>`).join("")}</ol>`
-    : '<p class="empty">Ничего не найдено.</p>';
-  $("#out").innerHTML = `
-    <div class="card"><div class="label">Ответ ${badge}</div><div>${esc(d.answer)}</div></div>
-    <div class="card"><div class="label">Найденные статьи · ${d.took_ms} мс</div>${docs}</div>`;
+  const badge = d.mode === "prototype" ? '<span class="badge">прототип</span>'
+    : d.mode === "fallback" ? '<span class="badge">модель недоступна</span>' : '';
+  const disclaimer = 'Это справка по тексту закона, а не юридическая консультация.';
+  const answer = d.answer.endsWith(disclaimer) ? d.answer.slice(0, -disclaimer.length).trimEnd() : d.answer;
+  const ageCard = d.age_documents?.length
+    ? `<section class="card age-card"><h2>Важно в вашем возрасте</h2>${articleList(d.age_documents, false)}</section>` : '';
+  $("#out").innerHTML = `<section class="card"><h2>Ответ ${badge}</h2><p>${esc(answer)}</p>
+    <p class="hint">${disclaimer}</p></section>${ageCard}
+    <section class="card"><h2>Найденные статьи</h2><p class="score">Поиск занял ${esc(d.took_ms)} мс</p>
+    ${d.documents.length ? articleList(d.documents, true) : '<p>Ничего не найдено.</p>'}</section>`;
 }
 
 fetch("/api/sources").then((r) => r.json()).then((s) => {
   $("#stat").textContent = `Корпус: ${s.documents} фрагментов статей — ${s.sources.map((x) => x.law).join(", ")}.`;
 }).catch(() => { $("#stat").textContent = ""; });
-</script>
-</body>
-</html>
+</script></body></html>

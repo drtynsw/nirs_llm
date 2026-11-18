@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Аналитика — администратор</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg:#f4f6f2; --card:#fff; --ink:#172821; --muted:#52645a; --line:#cdd8d0;
+  --accent:#176149; --soft:#e4f1e7; --on-accent:#fff; --cover:#123e32; --cover-text:#f4fff7;
+  --leaf:#b5e692; --leaf-shadow:#79b294; --warn:#79500a; --warn-soft:#fff2d2;
+  --bad:#9e2c30; --bad-soft:#fff0ef; --focus:#217655;
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px; --radius:20px; --hit:44px; --width:1120px;
+  --title:clamp(32px,5vw,62px); --pad:clamp(16px,2.5vw,32px);
+}
+@media(prefers-color-scheme:dark) {
+  :root {--bg:#101a16; --card:#192720; --ink:#edf6ef; --muted:#b4c7ba; --line:#3a5143;
+    --accent:#94dcb8; --on-accent:#112b20; --soft:#243d30; --cover:#173e32;
+    --warn:#f5cd7f; --warn-soft:#382e1b; --bad:#ffb8b7; --bad-soft:#422627; --focus:#b5e692}
+}
+* {box-sizing:border-box}
+[hidden] {display:none!important}
+body {margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+main {width:min(calc(100% - 2 * var(--s2)),var(--width));margin:auto;padding-bottom:var(--s4)}
+h1,h2,p {margin:0}
+h2 {font-size:clamp(20px,2vw,26px);line-height:1.2;letter-spacing:-.04em}
+button,select,input,textarea {font:inherit;color:inherit}
+button,select,input,a {min-height:var(--hit);min-width:var(--hit)}
+button,select,input,textarea {border:1px solid var(--line);border-radius:12px;background:var(--card);padding:8px 12px}
+button,select {cursor:pointer}
+button:hover:not(:disabled),select:hover {border-color:var(--accent)}
+button:disabled {cursor:wait}
+a {color:var(--accent);display:inline-flex;align-items:center}
+:focus-visible {outline:3px solid var(--focus);outline-offset:3px}
+.primary {font-weight:650;color:var(--on-accent);background:var(--accent);border-color:var(--accent);padding-inline:var(--s3)}
+.primary:hover:not(:disabled) {box-shadow:inset 0 0 0 2px var(--on-accent)}
+.card {border:1px solid var(--line);border-radius:var(--radius);background:var(--card);padding:var(--pad);min-width:0}
+.muted,.hint,footer,.score,.snippet {color:var(--muted)}
+.mast {display:flex;align-items:center;justify-content:space-between;gap:var(--s1);padding:var(--s2) 0;font-size:14px;font-weight:650}
+.brand {display:inline-flex;gap:10px;align-items:center}
+.mark {display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--accent);color:var(--on-accent);font:bold 24px/1 Georgia,serif}
+.mast small {color:var(--muted);font-weight:500}
+.error {color:var(--bad)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+
+.bar-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .login { max-width: 380px; margin: 12vh auto 0; }
+  .login form { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .error { color: var(--bad); min-height: 1.5em; margin: 0; }
+  .muted { color: var(--muted); }
+  .kpis { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
+  .kpi .v { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  .kpi .l { color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns:minmax(0,1fr); gap: 12px; margin-top: 12px; }
+  .wide { grid-column: 1 / -1; }
+  .days { display: flex; align-items: flex-end; gap: 2px; height: 160px; padding-top: 8px; }
+  .days div { flex: 1; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+  .days div.zero { background: var(--line); }
+  .days-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .hbar { display: grid; grid-template-columns: 170px 1fr 44px; gap: 8px; align-items: center; margin: 6px 0; font-size: 14px; }
+  .hbar .track { background: var(--soft); border-radius: 4px; height: 12px; overflow: hidden; }
+  .hbar .fill { background: var(--accent); height: 100%; }
+  .hbar .n { text-align: right; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .heat-wrap { overflow-x: auto; }
+  .heat td.num { min-width: 52px; }
+  .empty { color: var(--muted); padding: 24px 0; text-align: center; }
+  
+  h1 {font-size:clamp(28px,4vw,48px);line-height:1.12;letter-spacing:-.05em}
+  h2 {margin-bottom:var(--s2);font-size:20px}
+  .login {max-width:450px;margin:min(10vh,80px) auto}
+  .login h1 {font-size:32px;margin-bottom:var(--s2)}
+  .login input {width:100%}
+  .login .error:empty {display:none}
+  .bar-top {background:var(--cover);color:var(--cover-text);padding:var(--pad);border-radius:var(--radius)}
+  .bar-top .muted {color:var(--cover-text)}
+  .actions button,.actions select {color:var(--ink)}
+  .kpi .v {color:var(--accent);font-size:36px;font-variant-numeric:tabular-nums}
+  .kpi .l {font-size:15px}
+  .hbar {grid-template-columns:minmax(90px,1fr) minmax(48px,1.3fr) 32px}
+  .days {gap:1px}
+  .days div {min-width:0}
+  .heat-wrap {max-width:100%}
+  .grid + p {margin-top:var(--s2)}
+  @media(min-width:768px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .bench {margin-top:var(--s3)}
+  .bench-head {display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s1);align-items:baseline}
+  .bench-form {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s1) var(--s2);margin:var(--s2) 0}
+  .bench-form label {display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+  .bench-form label.check {flex-direction:row;align-items:center;gap:var(--s1);color:var(--ink)}
+  .bench-form input[type=checkbox] {min-height:auto;min-width:auto;width:20px;height:20px}
+  .bench-form .run {grid-column:1/-1}
+  @media(min-width:768px){.bench-form{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  .bench .kpis {margin-top:var(--s2)}
+  .bench .kpi .hint {font-size:13px;margin-top:4px}
+  .bench h3 {font-size:16px;margin:var(--s3) 0 var(--s1)}
+  .rel {color:var(--accent);font-weight:650}
+  .tag {display:inline-block;border-radius:999px;padding:0 8px;font-size:12px;font-weight:650;white-space:nowrap}
+  .tag.ok {background:var(--soft);color:var(--accent)}
+  .tag.bad {background:var(--bad-soft);color:var(--bad)}
+  details summary {cursor:pointer;min-height:var(--hit);display:flex;align-items:center;font-weight:650}
+  .q {max-width:360px}
+  #bench-status:empty {display:none}
+</style>
+</head>
+<body>
+<main>
+  <div class="mast"><span class="brand"><span class="mark" aria-hidden="true">§</span>Карманный справочник</span><small>Аналитика</small></div>
+  <section id="login" class="card login" hidden>
+    <h1>Вход администратора</h1>
+    <p class="muted">Токен — из переменной <code>ADMIN_TOKEN</code> или из консоли сервера.</p>
+    <form id="login-form">
+      <label for="token">Токен администратора</label>
+      <input id="token" type="password" autocomplete="current-password" required>
+      <button class="primary" type="submit">Войти</button>
+      <p class="error" id="login-error" role="alert"></p>
+    </form>
+    <p><a href="/">← К консультанту</a></p>
+  </section>
+
+  <section id="dash" hidden>
+    <div class="bar-top">
+      <div><h1>Аналитика</h1><span class="muted" id="since"></span></div>
+      <div class="actions">
+        <label>Период
+          <select id="days"><option value="7">7 дней</option><option value="30" selected>30 дней</option><option value="90">90 дней</option></select>
+        </label>
+        <button id="refresh" type="button">Обновить</button>
+        <button id="csv" type="button">Выгрузить CSV</button>
+        <button id="logout" type="button">Выйти</button>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="card kpi"><div class="v" id="k-total">—</div><div class="l">вопросов</div></div>
+      <div class="card kpi"><div class="v" id="k-noans">—</div><div class="l">без ответа</div></div>
+      <div class="card kpi"><div class="v" id="k-ms">—</div><div class="l">среднее время, мс</div></div>
+      <div class="card kpi"><div class="v" id="k-age">—</div><div class="l">указали возраст</div></div>
+    </div>
+
+    <div class="card"><h2>Обращения по дням</h2><div class="days" id="by-day"></div><div class="days-axis" id="by-day-axis"></div></div>
+
+    <div class="grid">
+      <div class="card"><h2>Возрастные группы</h2><div id="by-age"></div></div>
+      <div class="card"><h2>Темы вопросов</h2><div id="by-topic"></div></div>
+      <div class="card wide"><h2>Возраст × тема</h2><div class="heat-wrap" id="age-topic"></div></div>
+      <div class="card wide"><h2>Статьи в первых трёх местах выдачи</h2><div class="heat-wrap" id="top-articles"></div></div>
+    </div>
+    <p class="muted">Тексты вопросов и точный возраст не хранятся — только обезличенные признаки.</p>
+
+    <section class="card bench" id="bench" aria-labelledby="bench-title">
+      <div class="bench-head">
+        <h2 id="bench-title">Benchmark поиска</h2>
+        <span class="muted" id="bench-info"></span>
+      </div>
+      <p class="muted">Прогон тестового набора (benchmark/queries.jsonl) прямо в работающем приложении.
+        Тот же расчёт — <code>python -m benchmark.run</code>.</p>
+      <form id="bench-form" class="bench-form">
+        <label>Нормализация
+          <select id="b-mode"><option value="lemma">лемматизация</option><option value="stem">стемминг</option><option value="none">без нормализации</option></select>
+        </label>
+        <label>k1 <input id="b-k1" type="number" step="0.1" min="0.1" max="5" required></label>
+        <label>b <input id="b-b" type="number" step="0.05" min="0" max="1" required></label>
+        <label>Вес названия статьи <input id="b-tw" type="number" step="1" min="1" max="5" required></label>
+        <label>Порог отказа (оценка) <input id="b-min" type="number" step="0.5" min="0" max="100" required></label>
+        <label class="check"><input id="b-exp" type="checkbox"> Расширение запроса</label>
+        <label class="check"><input id="b-llm" type="checkbox"> С ответами LLM (Accuracy, медленнее)</label>
+        <label class="check"><input id="b-save" type="checkbox"> Сохранить отчёт в benchmark/results</label>
+        <button class="primary run" id="b-run" type="submit">Запустить benchmark</button>
+      </form>
+      <p class="muted" id="bench-status" role="status" aria-live="polite"></p>
+      <div id="bench-out"></div>
+    </section>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = "labor-law-admin-token";
+const tok = {
+  get() { try { return sessionStorage.getItem(KEY); } catch { return null; } },
+  set(v) { try { v ? sessionStorage.setItem(KEY, v) : sessionStorage.removeItem(KEY); } catch {} },
+};
+let token = tok.get();
+let requestId = 0;
+
+function show(logged) { $("#login").hidden = logged; $("#dash").hidden = !logged; }
+
+async function api(path) {
+  const r = await fetch(path, { headers: { Authorization: `Bearer ${token}` } });
+  if (r.status === 401) { const e = new Error("Неверный токен"); e.auth = true; throw e; }
+  if (!r.ok) throw new Error((await r.json()).error || "Ошибка сервера");
+  return r;
+}
+
+function hbars(items, label) {
+  const max = Math.max(1, ...items.map((x) => x.count));
+  if (!items.length) return '<p class="empty">Нет данных</p>';
+  return items.map((x) => `<div class="hbar"><span>${esc(label(x))}</span>
+    <span class="track"><span class="fill" style="display:block;width:${(x.count / max) * 100}%"></span></span>
+    <span class="n">${esc(x.count)}</span></div>`).join("");
+}
+
+function render(s) {
+  $("#since").textContent = `с ${s.since}`;
+  $("#k-total").textContent = s.total;
+  $("#k-noans").textContent = `${Math.round(s.no_answer_share * 100)}%`;
+  $("#k-ms").textContent = s.avg_took_ms;
+  $("#k-age").textContent = `${Math.round(s.age_given_share * 100)}%`;
+
+  const max = Math.max(1, ...s.by_day.map((d) => d.count));
+  $("#by-day").innerHTML = s.by_day.map((d) =>
+    `<div class="${d.count ? "" : "zero"}" style="height:${(d.count / max) * 100}%" title="${esc(d.date)}: ${esc(d.count)}"></div>`).join("");
+  $("#by-day-axis").innerHTML = `<span>${esc(s.by_day[0].date)}</span><span>${esc(s.by_day[s.by_day.length - 1].date)}</span>`;
+
+  $("#by-age").innerHTML = hbars(s.by_age_group, (x) => x.group);
+  $("#by-topic").innerHTML = hbars(s.by_topic, (x) => x.topic);
+
+  const groups = s.by_age_group.map((g) => g.group);
+  const topics = s.by_topic.map((t) => t.topic);
+  const cell = {}; let cmax = 1;
+  s.age_topic.forEach((x) => { cell[`${x.group}|${x.topic}`] = x.count; cmax = Math.max(cmax, x.count); });
+  $("#age-topic").innerHTML = topics.length ? `<table class="heat"><tr><th>Тема</th>${groups.map((g) => `<th>${esc(g)}</th>`).join("")}</tr>
+    ${topics.map((t) => `<tr><td>${esc(t)}</td>${groups.map((g) => {
+      const n = cell[`${g}|${t}`] || 0;
+      return `<td class="num" style="background:color-mix(in srgb, var(--accent) ${Math.round((n / cmax) * 25)}%, transparent)">${esc(n || "")}</td>`;
+    }).join("")}</tr>`).join("")}</table>` : '<p class="empty">Нет данных</p>';
+
+  $("#top-articles").innerHTML = s.top_articles.length
+    ? `<table><tr><th>#</th><th>Статья</th><th class="num">Раз</th></tr>${s.top_articles.map((a, i) =>
+        `<tr><td>${i + 1}</td><td>${esc(a.citation)}</td><td class="num">${esc(a.count)}</td></tr>`).join("")}</table>`
+    : '<p class="empty">Нет данных</p>';
+}
+
+// ---- Benchmark в рантайме (POST /api/admin/benchmark) ----
+let benchLoaded = false;
+const pct = (x) => (x * 100).toFixed(0) + "%";
+const f3 = (x) => Number(x).toFixed(3);
+
+function fillBenchForm(c) {
+  $("#b-mode").value = c.mode; $("#b-k1").value = c.k1; $("#b-b").value = c.b;
+  $("#b-tw").value = c.title_weight; $("#b-min").value = c.min_score; $("#b-exp").checked = c.expand;
+}
+
+async function loadBenchDefaults() {
+  if (benchLoaded) return;
+  const info = await (await api("/api/admin/benchmark")).json();
+  benchLoaded = true;
+  fillBenchForm(info.default);
+  $("#b-llm").disabled = !info.llm_enabled;
+  $("#bench-info").textContent = `${info.queries.regular} обычных вопросов, ${info.queries.traps} ловушек · LLM: ${info.llm}`
+    + (info.lemma_available ? "" : " · pymorphy3 не установлен — вместо лемматизации стемминг");
+}
+
+function renderBench(r) {
+  const m = r.metrics, by = r.retrieval;
+  const kpi = (v, l, hint) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${hint ? `<div class="hint muted">${hint}</div>` : ""}</div>`;
+  const rows = (obj) => Object.entries(obj).map(([k, x]) =>
+    `<tr><td>${esc(k)}</td><td class="num">${x.n}</td><td class="num">${f3(x["recall@5"])}</td><td class="num">${f3(x["recall@10"])}</td><td class="num">${f3(x["mrr@10"])}</td></tr>`).join("");
+  const top = (x) => x.top.slice(0, 3).map((t) => t.relevant ? `<span class="rel">${esc(t.citation)}</span>` : esc(t.citation)).join("; ") || "—";
+  $("#bench-out").innerHTML = `
+    <div class="kpis">
+      ${kpi(f3(m["recall@5"]), "Recall@5", `Recall@10 ${f3(m["recall@10"])}`)}
+      ${kpi(f3(m["mrr@10"]), "MRR@10")}
+      ${kpi(pct(m.correct_rejection_rate), "Correct Rejection Rate", `ложных отказов ${pct(m.false_rejection_rate)}`)}
+      ${kpi(m.accuracy == null ? "—" : f3(m.accuracy), "Accuracy", esc(m.accuracy_note))}
+    </div>
+    <p class="muted">${esc(r.config.mode_effective)} · k1=${r.config.k1} · b=${r.config.b} · вес названия ${r.config.title_weight}
+      · расширение ${r.config.expand ? "да" : "нет"} · порог ${r.config.min_score} · LLM: ${esc(r.llm)}
+      · ${r.took_ms} мс${m.accuracy != null ? ` · ссылки вне выдачи ${pct(m.unsupported_citation_rate)} · ошибок модели ${m.llm_errors}` : ""}${r.saved ? ` · сохранено: ${esc(r.saved)}` : ""}</p>
+    <h3>По срезам</h3>
+    <div class="heat-wrap"><table><tr><th>Срез</th><th class="num">n</th><th class="num">R@5</th><th class="num">R@10</th><th class="num">MRR</th></tr>
+      ${rows(by.style)}${rows(by.split)}</table></div>
+    <h3>Разбор ошибок</h3>
+    ${r.errors.length ? `<div class="heat-wrap"><table><tr><th>ID</th><th>Вопрос</th><th class="num">Ранг</th><th>Не найдено в top-5</th><th>Top-3</th></tr>
+      ${r.errors.map((e) => `<tr><td>${esc(e.id)}</td><td class="q">${esc(e.query)}</td><td class="num">${e.refused ? '<span class="tag bad">отказ</span>' : esc(e.rank ?? "—")}</td>
+        <td>${esc(e["missing@5"].join(", "))}</td><td>${esc(e.top.join("; ") || "—")}</td></tr>`).join("")}</table></div>`
+      : '<p class="muted">Ошибок нет.</p>'}
+    <h3>Ловушки</h3>
+    <div class="heat-wrap"><table><tr><th>ID</th><th>Вопрос</th><th>Результат</th><th class="num">Оценка</th></tr>
+      ${r.traps.map((t) => `<tr><td>${esc(t.id)}</td><td class="q">${esc(t.query)}</td>
+        <td>${t.refused ? '<span class="tag ok">отказ</span>' : `<span class="tag bad">ответ</span> ${esc(t.top[0]?.citation || "")}`}</td>
+        <td class="num">${t.top_score.toFixed(1)}</td></tr>`).join("")}</table></div>
+    <details><summary>Все обычные вопросы (${r.regular.length})</summary>
+      <div class="heat-wrap"><table><tr><th>ID</th><th>Вопрос</th><th class="num">Ранг</th><th class="num">R@5</th><th>Top-3 (релевантные выделены)</th>${m.accuracy != null ? "<th>Ответ модели / эталон</th>" : ""}</tr>
+        ${r.regular.map((x) => `<tr><td>${esc(x.id)}</td><td class="q">${esc(x.query)}</td><td class="num">${x.refused ? '<span class="tag bad">отказ</span>' : esc(x.rank ?? "—")}</td>
+          <td class="num">${f3(x["recall@5"])}</td><td>${top(x)}</td>${m.accuracy != null ? `<td class="q">${x.correct ? '<span class="tag ok">верно</span>' : '<span class="tag bad">проверить</span>'} ${esc(x.answer)}<br><span class="muted">Эталон: ${esc(x.reference)}</span></td>` : ""}</tr>`).join("")}</table></div>
+    </details>`;
+}
+
+$("#bench-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const body = { mode: $("#b-mode").value, k1: Number($("#b-k1").value), b: Number($("#b-b").value),
+                 title_weight: Number($("#b-tw").value), min_score: Number($("#b-min").value),
+                 expand: $("#b-exp").checked, save: $("#b-save").checked, llm: $("#b-llm").checked };
+  $("#b-run").disabled = true; $("#b-run").textContent = "Считаю…"; $("#bench-status").textContent = body.llm ? "Идёт прогон benchmark с ответами модели — до пары минут…" : "Идёт прогон benchmark…";
+  try {
+    const r = await fetch("/api/admin/benchmark", { method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Ошибка сервера");
+    renderBench(data); $("#bench-status").textContent = "Готово.";
+  } catch (err) {
+    $("#bench-status").textContent = ""; $("#bench-out").innerHTML = `<p class="error" role="alert">${esc(err.message)}</p>`;
+  } finally { $("#b-run").disabled = false; $("#b-run").textContent = "Запустить benchmark"; }
+});
+
+async function load() {
+  const id = ++requestId;
+  try {
+    const r = await api(`/api/admin/stats?days=${$("#days").value}`);
+    const stats = await r.json();
+    if (id !== requestId) return;
+    render(stats); show(true);
+    loadBenchDefaults().catch(() => {});
+  } catch (e) {
+    if (id !== requestId) return;
+    if (e.auth) { token = null; tok.set(null); show(false); $("#login-error").textContent = "Неверный токен"; }
+    else alert(e.message);
+  }
+}
+
+$("#login-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  token = $("#token").value.trim(); tok.set(token); $("#login-error").textContent = ""; load();
+});
+$("#days").addEventListener("change", load);
+$("#refresh").addEventListener("click", load);
+$("#logout").addEventListener("click", () => { requestId++; token = null; tok.set(null); $("#token").value = ""; show(false); });
+$("#csv").addEventListener("click", async () => {
+  try {
+    const days = $("#days").value;
+    const blob = await (await api(`/api/admin/export.csv?days=${days}`)).blob();
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: `analytics_${days}d.csv` });
+    a.click(); URL.revokeObjectURL(a.href);
+  } catch (e) { alert(e.message); }
+});
+
+show(false);
+if (token) load();
+</script>
+</body>
+</html>
