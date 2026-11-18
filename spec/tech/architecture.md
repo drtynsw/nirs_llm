@@ -8,12 +8,20 @@
    ▼
 app/server.py ── ask()
    │ 1. проверка ввода
-   │ 2. search(question, top_k)  ──►  app/retrieval/  (КТ2: BM25)
-   │                                   сейчас: app/search_stub.py
+   │ 2. rag.respond(question, top_k)
+   │      ├─ retrieval.search    ──►  app/retrieval/  (BM25, КТ2)
+   │      └─ порог С4 (min_score)
    │ 3. answer(question, docs)   ──►  app/llm.py      (КТ2: вызов LLM)
    │                                   сейчас: app/llm_stub.py
+   │ 4. age.note / age.documents ──►  app/age.py      (нормы для возраста < 18)
+   │ 5. STORE.record(...)        ──►  app/analytics.py → data/analytics.sqlite3
    ▼
-JSON {answer, documents[], took_ms, mode}
+JSON {answer, documents[], age_group, age_documents[], took_ms, mode}
+
+Браузер (app/static/admin.html)
+   │  GET /api/admin/stats, /api/admin/export.csv  + Bearer-токен
+   ▼
+app/server.py ── проверка токена (app/config.py) ── STORE.stats() / export_csv()
 ```
 
 Офлайн-часть:
@@ -21,7 +29,9 @@ JSON {answer, documents[], took_ms, mode}
 ```
 открытый набор данных (npm)  ──scripts/fetch_laws.py──►  data/raw/laws.jsonl
 актуальная редакция (.txt)   ──scripts/parse_law_text.py──┘ (КТ2)
-data/raw/laws.jsonl ──scripts/build_corpus.py──► data/corpus.jsonl ──(КТ2) build_index──► data/index.json
+data/raw/laws.jsonl ──scripts/build_corpus.py──► data/corpus.jsonl ──(старт сервера)──► индекс BM25 в памяти
+
+benchmark/queries.jsonl ──benchmark/run.py (или /admin)──► метрики, benchmark/results/*.json
 ```
 
 ## Компоненты
@@ -31,12 +41,26 @@ data/raw/laws.jsonl ──scripts/build_corpus.py──► data/corpus.jsonl ─
 | `scripts/fetch_laws.py` | выгрузка ТК, ГК, 422-ФЗ из открытого набора данных | готово |
 | `scripts/parse_law_text.py` | разбор актуальной редакции из текста по «Статья N.» | готово, применяем на КТ2 |
 | `scripts/build_corpus.py` | статьи → документы (длинные делятся на фрагменты) | готово |
-| `app/retrieval/preprocess.py` | нижний регистр, токенизация, стоп-слова, лемматизация | КТ2 |
-| `app/retrieval/bm25.py` | инвертированный индекс, IDF, оценка BM25, top-k | КТ2 |
-| `app/llm.py` | промпт по найденным статьям, вызов модели | КТ2 |
-| `app/server.py` | HTTP, валидация, сборка ответа | готово |
+| `app/retrieval/preprocess.py` | нижний регистр, токенизация, стоп-слова, лемматизация | готово (КТ2) |
+| `app/retrieval/stemmer.py` | стеммер Snowball — сравнение и запасной вариант без pymorphy3 | готово (КТ2) |
+| `app/retrieval/bm25.py` | инвертированный индекс, IDF, оценка BM25, top-k | готово (КТ2) |
+| `app/retrieval/expansion.py` | словарь расширения запроса | готово (КТ2) |
+| `app/retrieval/__init__.py` | конфигурация, кэш индексов, `search()`, фрагменты | готово (КТ2) |
+| `app/rag.py` | поиск → порог С4 → ответ LLM; общий для сервера и benchmark | готово (КТ2) |
+| `app/llm.py` | промпт по найденным статьям, вызов OpenAI-совместимого API, отказ, проверка ссылок | готово (КТ2) |
+| `app/server.py` | HTTP, валидация, сборка ответа, маршруты админки | готово |
+| `app/config.py` | `.env`, `ADMIN_TOKEN`, `ANALYTICS_DB` | КТ2 |
+| `app/age.py` | проверка возраста, группы, пояснение и статьи для < 18 | КТ2 |
+| `app/analytics.py` | запись событий в SQLite, агрегаты, CSV | КТ2 |
+| `app/static/admin.html` | страница администратора | КТ2 |
 | `app/static/index.html` | интерфейс | готово |
-| `benchmark/` | запросы, разметка, расчёт Recall@k и MRR | формат готов, данные — КТ2 |
+| `benchmark/` | запросы, разметка, Recall@k, MRR, CRR; запуск из CLI и `/admin` | готово (КТ2) |
+
+## Диагностика ошибок модели
+
+В журнал и поле `llm_error` отчёта попадают HTTP-код или фиксированная категория
+ошибки. Тело HTTP-ответа провайдера и произвольное сообщение транспортного
+исключения туда не копируются. Правила повторов и перехода на заглушку сохраняются.
 
 ## Решения
 
@@ -47,7 +71,22 @@ data/raw/laws.jsonl ──scripts/build_corpus.py──► data/corpus.jsonl ─
   на «ст. 70 ТК РФ». Статьи длиннее 350 слов (их 21, например ст. 81) делим на
   фрагменты по абзацам, иначе они выигрывают поиск просто за счёт длины.
   Средний размер документа ~105 слов.
-- **Заглушки с тем же интерфейсом**, что и будущие модули: `search(query, top_k)` и
-  `answer(question, docs)`. Замена на КТ2 — одна строка импорта в `server.py`.
-- **Индекс в памяти.** 513 документов, индекс < 5 МБ; строится при старте
-  или читается из `data/index.json`.
+- **LLM через OpenAI-совместимый API на `urllib`** — без SDK и внешних зависимостей;
+  провайдер меняется в `.env`. Без настройки или при ошибке модели ответ формирует
+  заглушка `app/llm_stub.py` (`mode = "prototype"` / `"fallback"`), найденные статьи
+  показываются в любом случае.
+  Поиск-заглушка КТ1 (`search_stub.py`) удалена — её заменил BM25.
+- **Индекс в памяти.** 513 документов, ~2,9 тыс. термов; строится при старте
+  сервера за ≈0,4 с, файл индекса не нужен. Для каждой конфигурации benchmark
+  индекс строится один раз и кэшируется.
+- **Один конвейер для пользователя и benchmark** (`app/rag.py`): метрики считаются
+  на том же коде, который отвечает в интерфейсе.
+- **Возраст — отдельно от поиска.** Статьи для несовершеннолетних отдаются в
+  `age_documents`, а не подмешиваются в `documents`: так benchmark BM25 меряет
+  чистое ранжирование, а пользователь всё равно видит нужные нормы.
+- **Аналитика в SQLite** (`sqlite3` из стандартной библиотеки): одна таблица
+  событий, агрегаты считаются SQL-запросами на лету. Файл в `.gitignore`.
+- **Роль администратора — общий токен.** Пользователей с паролями нет: команде из
+  трёх человек и куратору достаточно одного секрета. Если `ADMIN_TOKEN` не задан,
+  сервер генерирует токен при старте и печатает его в консоль — `python -m app`
+  работает без настройки.

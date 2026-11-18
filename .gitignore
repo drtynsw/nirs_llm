@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.env
+data/analytics.sqlite3
+data/analytics.sqlite3-*

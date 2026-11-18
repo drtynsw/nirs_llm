@@ -9,8 +9,8 @@ DISCLAIMER = "Это справка по тексту закона, а не юр
 
 def answer(question: str, docs: list[dict]) -> str:
     if not docs:
-        return ("В загруженных законах не нашлось подходящих статей. "
-                "Попробуйте описать ситуацию другими словами.")
+        from app.rag import NO_ANSWER
+        return NO_ANSWER
     refs = "; ".join(f"{d['citation']} «{d['title']}»" for d in docs[:3])
     return ("Прототип: здесь будет короткий ответ языковой модели, составленный только "
             f"по найденным статьям. Наиболее подходящие сейчас: {refs}. {DISCLAIMER}")

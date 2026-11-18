@@ -1,7 +1,9 @@
 """Тесты прототипа (КТ1). Запуск: python -m unittest -v"""
 import unittest
 
-from app import server
+from app import analytics, server
+
+server.STORE = analytics.Store(":memory:")
 
 
 class AskTest(unittest.TestCase):
